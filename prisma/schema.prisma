@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  tickets   Ticket[]  // relasi ke Ticket
+  createdAt DateTime  @default(now())
+}
+
+model Ticket {
+  id          String        @id @default(uuid())
+  queueNumber String
+  status      TicketStatus  @default(WAITING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // relasi
+  userId     String
+  serviceId  String
+  user       User     @relation(fields: [userId], references: [id])
+  service    Service  @relation(fields: [serviceId], references: [id])
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  name        String
+  prefix      String
+  description String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  tickets     Ticket[]
+}
+
+// ENUMs
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TicketStatus {
+  WAITING
+  CALLED
+  DONE
+  CANCELLED
+}
