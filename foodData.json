@@ -1,0 +1,47 @@
+[
+  {
+    "id": "beng_beng",
+    "display_name": "Beng Beng Bar",
+    "calories": 100,
+    "fat": 5,
+    "sugar": 7,
+    "salt": 0.025,
+    "risk_factors": ["Tinggi Gula"]
+  },
+  {
+    "id": "silverqueen_rockr",
+    "display_name": "SilverQueen Rock'r",
+    "calories": 120,
+    "fat": 7,
+    "sugar": 8,
+    "salt": 0.025,
+    "risk_factors": ["Tinggi Lemak", "Gula Sedang"]
+  },
+  {
+    "id": "tango_wafer_chocolate",
+    "display_name": "Tango Wafer Chocolate",
+    "calories": 100,
+    "fat": 4.0,
+    "sugar": 5.0,
+    "salt": 0.05,
+    "risk_factors": ["Tinggi Gula", "Lemak Sedang"]
+  },
+  {
+    "id": "oreo_cookie",
+    "display_name": "Oreo (sandwich cookie)",
+    "calories": 140,
+    "fat": 6.0,
+    "sugar": 11.0,
+    "salt": 0.0,
+    "risk_factors": ["Tinggi Gula", "Lemak Sedang"]
+  },
+  {
+    "id": "kitkat_bar",
+    "display_name": "KitKat Wafer Bar",
+    "calories": 90,
+    "fat": 5.0,
+    "sugar": null,
+    "salt": 0.015,
+    "risk_factors": ["Lemak Sedang"]
+  }
+]
