@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriSense JKN - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-green-600 p-6 text-center">
+            <h1 class="text-white text-2xl font-bold">NutriSense JKN</h1>
+            <p class="text-green-100 text-sm">Deteksi Gizi Berbasis AI</p>
+        </div>
+
+        <div class="p-6 space-y-6">
+            
+            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-50 transition" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="previewImage(event)">
+                <div id="uploadPlaceholder">
+                    <div class="text-4xl mb-2">📷</div>
+                    <p class="text-gray-500 text-sm">Ketuk untuk ambil foto / upload</p>
+                </div>
+                <img id="preview" class="hidden w-full h-48 object-cover rounded-lg mx-auto" />
+            </div>
+
+            <button onclick="scanFood()" id="scanBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
+                🔍 Analisis Sekarang
+            </button>
+
+            <div id="loading" class="hidden text-center py-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-2"></div>
+                <p class="text-gray-500 text-sm">AI sedang berpikir...</p>
+            </div>
+
+            <div id="resultCard" class="hidden bg-gray-50 rounded-xl p-5 border border-gray-200">
+                <h2 id="foodName" class="text-xl font-bold text-gray-800 mb-1">Nama Makanan</h2>
+                <p id="healthAdvice" class="text-sm text-gray-500 mb-4 italic">Saran kesehatan...</p>
+                
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="bg-white p-2 rounded shadow-sm">
+                        <span class="block text-gray-400 text-xs">Kalori</span>
+                        <span id="calVal" class="font-bold text-lg">0</span> kkal
+                    </div>
+                    <div class="bg-white p-2 rounded shadow-sm">
+                        <span class="block text-gray-400 text-xs">Gula</span>
+                        <span id="sugarVal" class="font-bold text-lg">0</span> g
+                    </div>
+                    <div class="bg-white p-2 rounded shadow-sm">
+                        <span class="block text-gray-400 text-xs">Lemak</span>
+                        <span id="fatVal" class="font-bold text-lg">0</span> g
+                    </div>
+                    <div class="bg-white p-2 rounded shadow-sm">
+                        <span class="block text-gray-400 text-xs">Protein</span>
+                        <span id="protVal" class="font-bold text-lg">0</span> g
+                    </div>
+                </div>
+
+                <div id="riskBadge" class="mt-4 text-center py-2 rounded-lg font-bold text-white text-sm uppercase tracking-wide">
+                    AMAN
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').classList.remove('hidden');
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function scanFood() {
+            if (!selectedFile) return alert("Pilih foto dulu bos!");
+
+            // UI Loading
+            document.getElementById('scanBtn').disabled = true;
+            document.getElementById('scanBtn').innerText = "Sedang Menganalisis...";
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('resultCard').classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+
+            try {
+                // Kirim ke Server Node.js kita
+                const response = await fetch('http://localhost:3000/scan', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Tampilkan Data
+                document.getElementById('foodName').innerText = data.nama_produk;
+                document.getElementById('healthAdvice').innerText = data.analisa_kesehatan;
+                document.getElementById('calVal').innerText = data.estimasi_gizi.kalori;
+                document.getElementById('sugarVal').innerText = data.estimasi_gizi.gula;
+                document.getElementById('fatVal').innerText = data.estimasi_gizi.lemak;
+                document.getElementById('protVal').innerText = data.estimasi_gizi.protein;
+
+                // Atur Warna Badge Risiko
+                const badge = document.getElementById('riskBadge');
+                const color = data.warna_risiko.toLowerCase();
+                
+                if(color === 'merah') {
+                    badge.className = "mt-4 text-center py-2 rounded-lg font-bold text-white text-sm uppercase tracking-wide bg-red-500";
+                    badge.innerText = "BERISIKO TINGGI";
+                } else if (color === 'kuning') {
+                    badge.className = "mt-4 text-center py-2 rounded-lg font-bold text-white text-sm uppercase tracking-wide bg-yellow-500";
+                    badge.innerText = "WASPADA";
+                } else {
+                    badge.className = "mt-4 text-center py-2 rounded-lg font-bold text-white text-sm uppercase tracking-wide bg-green-500";
+                    badge.innerText = "AMAN KONSUMSI";
+                }
+
+                document.getElementById('resultCard').classList.remove('hidden');
+
+            } catch (err) {
+                alert("Gagal: " + err.message);
+            } finally {
+                // Reset UI
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('scanBtn').disabled = false;
+                document.getElementById('scanBtn').innerText = "🔍 Analisis Sekarang";
+            }
+        }
+    </script>
+</body>
+</html>
