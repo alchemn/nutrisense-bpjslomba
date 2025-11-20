@@ -1,16 +1,12 @@
-import {Router} from 'express'
+import { Router } from 'express'
 import multer from 'multer'
-import { analyzeFood } from '../controller/analyzeController'
+import { analyzeFoodController } from '../controller/analyzeController'
 
 const router = Router();
 
-const storage = multer.diskStorage({
-    destination: "src/uploads",
-    filename: (_,file,cb) => cb(null,Date.now() + "-" + file.originalname)
-})
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
 
-const upload = multer({storage})
-
-router.post("/analyze",upload.single("image"),analyzeFood)
+router.post("/analyze", upload.single("image"), analyzeFoodController)
 
 export default router

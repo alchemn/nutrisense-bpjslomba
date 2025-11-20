@@ -1,24 +1,31 @@
-import {Request,Response} from "express"
-import { detectFood } from "../services/visionService"
-import { getNutritionInfo } from "../services/nutritionService"
-import { calculateRisk } from "../utils/riskCalculator"
+import { Request, Response } from "express";
+import { analyzeFood } from "../services/aiService";
 
-export async function analyzeFood(req:Request, res:Response) {
+export async function analyzeFoodController(req: Request, res: Response) {
     try {
-        if(!req.file){
-            return res.status(400).json({error: "Gambar tidak ditemukan"})
+        if (!req.file) {
+            return res.status(400).json({ 
+                status: "Error",
+                message: "Gambar tidak ditemukan" 
+            });
         }
-        const foodName = await detectFood(req.file.path)
-        const nutrition = await getNutritionInfo(foodName)
-        const risk = calculateRisk(nutrition)
-        res.json({
+
+        const imageBuffer = req.file.buffer;
+
+
+        const result = await analyzeFood(imageBuffer);
+
+        return res.json({
             status: "Success",
-            foodName,
-            nutrition,
-            risk
-        })
+            data: result
+        });
+
     } catch (err) {
-       console.error(err);
-       res.status(500).json({error: "Gagal Menganalisa Makanan"})
+        console.error("Analyze error:", err);
+        const errorMessage = err instanceof Error ? err.message : "Gagal Menganalisa Makanan";
+        return res.status(500).json({ 
+            status: "Error",
+            message: errorMessage
+        });
     }
 }
