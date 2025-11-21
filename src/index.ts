@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import analyzeRouter from './routes/analyze'
+import authRouter from './routes/auth';
 
 const port = process.env.PORT || 3000;
 
@@ -13,6 +14,7 @@ app.use(express.json())
 app.use("/uploads", express.static("src/uploads"))
 
 app.use("/api", analyzeRouter)
+app.use("/api/auth", authRouter)
 
 app.get("/", (_, res) => {
   res.send("Nutrisense JKN Hore")

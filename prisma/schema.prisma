@@ -1,0 +1,48 @@
+// =====================
+//  GENERATOR & DB SETUP
+// =====================
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String        @id @default(uuid())
+  email     String        @unique
+  password  String
+  createdAt DateTime      @default(now())
+
+  // Relasi: 1 user punya banyak FoodHistory
+  histories FoodHistory[]
+}
+
+model FoodHistory {
+  id        String   @id @default(uuid())
+  userId    String
+
+  foodName  String
+
+  // Nutrisi
+  kalori    Float
+  lemak     Float
+  gula      Float
+  protein   Float
+  sodium    Float
+
+
+  diabetes    String
+  hipertensi  String
+  kolesterol  String
+
+  // Rekomendasi AI
+  recommendation String
+
+  createdAt DateTime @default(now())
+
+  // Relasi ke User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

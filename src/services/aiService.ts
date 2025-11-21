@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Konfigurasi awal untuk koneksi ke Google AI
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
 export const analyzeFood = async (imageBuffer: Buffer) => {
@@ -13,7 +12,7 @@ export const analyzeFood = async (imageBuffer: Buffer) => {
     Anda adalah seorang ahli gizi dari Indonesia. Tugas Anda adalah menganalisis gambar makanan yang diberikan.
 
     Berikan output dalam format JSON murni, dengan struktur sebagai berikut:
-    
+
     {
       "foodName": "nama makanan",
       "nutrition": {
@@ -23,11 +22,13 @@ export const analyzeFood = async (imageBuffer: Buffer) => {
         "protein": 0,
         "sodium": 0
       },
-      "healthOpinion": "pendapat kesehatan singkat",
-      "recommendations": [
-        "rekomendasi 1",
-        "rekomendasi 2"
-      ]
+      "risk": {
+        "diabetes": "rendah|sedang|tinggi",
+        "hipertensi": "rendah|sedang|tinggi",
+        "kolesterol": "rendah|sedang|tinggi"
+      },
+      "recommendation": "rekomendasi kesehatan",
+      "healthOpinion": "pendapat kesehatan singkat"
     }
     `;
 
@@ -36,7 +37,7 @@ export const analyzeFood = async (imageBuffer: Buffer) => {
         {
             inlineData: {
                 data: imageBuffer.toString("base64"),
-                mimeType: "image/jpeg"
+                mimeType:'image/jpeg' // Provide a default if req.file is undefined
             }
         }
     ]);
@@ -51,8 +52,8 @@ export const analyzeFood = async (imageBuffer: Buffer) => {
 
     try {
         return JSON.parse(cleanJson);
-    } catch (error) {
-        console.error("Gagal parse JSON dari AI:", cleanJson);
+    } catch (_error) {
+        console.error("Gagal parse JSON dari AI:", cleanJson, _error);
         throw new Error("Gagal memproses respons dari server AI.");
     }
 }
