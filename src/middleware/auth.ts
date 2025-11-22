@@ -1,15 +1,16 @@
 import jwt from 'jsonwebtoken'
 import {Request, Response, NextFunction} from 'express'
+import prisma from '../utils/prisma';
 
 const JWT = process.env.JWT_SECRET as string
 
-interface DecodedUser {
+interface DecodedToken {
     id: string
     email: string
     iat: number
 }
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,15 +23,19 @@ export const authMiddleware = (
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  jwt.verify(token, JWT, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Token Invalid" });
+  try {
+    const decoded = jwt.verify(token, JWT) as DecodedToken;
+    const user = await prisma.user.findUnique({
+        where: { id: decoded.id }
+    });
+
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
     }
 
-    req.user = decoded as DecodedUser;
-
-    console.log("Authenticated user:", req.user);
-
+    req.user = user;
     next();
-  });
+  } catch (err) {
+    return res.status(403).json({ message: "Token Invalid" });
+  }
 };

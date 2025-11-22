@@ -5,19 +5,9 @@ import "express";
 declare global {
   namespace Express {
     interface Request {
-      user?: User;
+      user?: User & { iat?: number };
       file?: File;
     }
-  }
-}
-
-declare module "express" {
-  interface Request {
-    user?: {
-      id: string;
-      email: string;
-      iat: number;
-    };
   }
 }
 
