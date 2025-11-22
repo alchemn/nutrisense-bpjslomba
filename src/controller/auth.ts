@@ -64,6 +64,7 @@ export async function login(req:Request, res:Response){
         },JWT)
         res.status(200).json({
             message: "Login Berhasil",
+            user: findEmail,
             token
         })
     } catch (error:unknown) {

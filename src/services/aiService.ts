@@ -57,3 +57,33 @@ export const analyzeFood = async (imageBuffer: Buffer) => {
         throw new Error("Gagal memproses respons dari server AI.");
     }
 }
+
+export const generateHealthTips = async () => {
+    const model = ai.getGenerativeModel({
+        model: "gemini-2.0-flash"
+    });
+
+    const prompt = `
+    Anda adalah seorang ahli gizi dari Indonesia. Berikan 2 tips kesehatan harian yang singkat dan mudah diikuti.
+    Berikan output dalam format JSON murni, sebagai array string, contoh:
+    ["Tip 1", "Tip 2"]
+    `;
+
+    const result = await model.generateContent([
+        { text: prompt },
+    ]);
+
+    const response = result.response.text();
+
+    const cleanJson = response
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+    try {
+        return JSON.parse(cleanJson); // Expecting an array of strings
+    } catch (_error) {
+        console.error("Gagal parse JSON tips kesehatan dari AI:", cleanJson, _error);
+        throw new Error("Gagal memproses respons tips kesehatan dari server AI.");
+    }
+}

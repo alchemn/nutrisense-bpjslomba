@@ -1,5 +1,6 @@
 import { User } from '@prisma/client';
 import { File } from 'multer';
+import "express";
 
 declare global {
   namespace Express {
@@ -7,6 +8,16 @@ declare global {
       user?: User;
       file?: File;
     }
+  }
+}
+
+declare module "express" {
+  interface Request {
+    user?: {
+      id: string;
+      email: string;
+      iat: number;
+    };
   }
 }
 
