@@ -255,8 +255,12 @@ export async function countAnalyze(req:Request,res:Response){
             message: "Success",
             data
         })
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({message:error.message})
+    } catch (err) {
+        console.log(err)
+        const errorMessage = err instanceof Error ? err.message : "Gagal Menganalisa Makanan";
+        return res.status(500).json({ 
+            status: "Error",
+            message: errorMessage
+        });
     }
 }
