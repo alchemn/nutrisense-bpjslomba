@@ -24,7 +24,7 @@ export async function analyzeFoodController(req: Request, res: Response) {
             })
         }
 
-        // Validasi struktur data dari AI sebelum menyimpan ke database
+
         if (!aiRes.foodName || !aiRes.nutrition || !aiRes.risk || !aiRes.recommendation) {
             return res.status(500).json({
                 status: "Error",
@@ -51,7 +51,7 @@ export async function analyzeFoodController(req: Request, res: Response) {
             }
         });
 
-        // Return response ke frontend
+
         return res.json({
             status: "Success",
             data: aiRes
