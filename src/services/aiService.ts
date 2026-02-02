@@ -37,7 +37,7 @@ export const analyzeFood = async (imageBuffer: Buffer) => {
         {
             inlineData: {
                 data: imageBuffer.toString("base64"),
-                mimeType:'image/jpeg' // Provide a default if req.file is undefined
+                mimeType:'image/jpeg'
             }
         }
     ]);
@@ -81,7 +81,7 @@ export const generateHealthTips = async () => {
         .trim();
 
     try {
-        return JSON.parse(cleanJson); // Expecting an array of strings
+        return JSON.parse(cleanJson);
     } catch (_error) {
         console.error("Gagal parse JSON tips kesehatan dari AI:", cleanJson, _error);
         throw new Error("Gagal memproses respons tips kesehatan dari server AI.");
